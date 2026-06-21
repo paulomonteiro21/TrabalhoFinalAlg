@@ -2,10 +2,12 @@
 def limpar():
     print('\033[H\033[J', end='')
 
-
+def operação_sucesso():
+    print('\n✅ Operação feita com sucesso!')
+    input('\nPressione ENTER para continuar...')
 # Exibe mensagem de livro não encontrado
-def naoencontrado():
-    print('\n❌ Livro não encontrado')
+def naoencontrado(x):
+    print(f'\n❌ "{x}" não encontrado')
     input('\nPressione ENTER para continuar...')
 
 
@@ -16,12 +18,35 @@ class Livros:
     codigo = ''
     status = ''
 
+
+# Função para printar os dados dos livros
+def print_livros(livros,i):
+    print('-' * 40)
+
+    print(f'Título: {livros[i].titulo}')
+    print(f'Autor: {livros[i].autor}')
+    print(f'ano: {livros[i].ano}')
+    print(f'Código: {livros[i].codigo}')
+    print(f'Status: {livros[i].status}')
+
+    print('-' * 40)
+
+
 # Percorre a lista de livros e retorna o índice do livro com o código informado, ou -1 se não encontrar
 def pega_codigo(livros,codigo): 
 	for i in range(len(livros)):
 		if livros[i].codigo == codigo:
 			return i
 	return -1
+
+
+# Bubble sort que ordena alfabeticamente, .lower para garantir que maiúsculas e minúsculas não interfiram na ordenação
+def ordenar_livros(livros):
+    for i in range(len(livros)):
+        for j in range(0, len(livros)-i-1):
+            if livros[j].titulo.lower() > livros[j+1].titulo.lower():
+                livros[j], livros[j+1] = livros[j+1], livros[j]
+
 
 # Cadastra um novo livro na lista, verificando se o código já existe
 def cadastrar_livro(livros):
@@ -38,12 +63,13 @@ def cadastrar_livro(livros):
     i = pega_codigo(livros,livro.codigo)
     if i!=-1:
         print('\n❌ Esse livro já está no sistema')
+        input('\nPressione ENTER para continuar...')
         return
     livro.status = 'Disponível'
     livros.append(livro)
 
-    print('\n✅ Livro cadastrado com sucesso!')
-    input('\nPressione ENTER para continuar...')
+    operação_sucesso()
+
 
 # Consulta um livro por código ou por autor
 def consultar_livros(livros):
@@ -57,28 +83,22 @@ def consultar_livros(livros):
         codigo = input('Digite o código do livro que deseja consultar: ')
         i = pega_codigo(livros,codigo)
         if i!=-1:
-           print_livros(livros,i)
+            print_livros(livros,i)
+            operação_sucesso()
         else:
-            print('\n❌ Livro não encontrado.')
+            naoencontrado(codigo)
     else:
         autor = input('Autor: ')
+        encontrou = False
         for i in range(len(livros)):
             if autor == livros[i].autor:
                print_livros(livros,i)
+               encontrou = True
+        if encontrou:
+            operação_sucesso()
+        else:
+            naoencontrado(autor)
 
-    input('\nPressione ENTER para continuar...')
-
-# Função para printar os dados dos livros
-def print_livros(livros,i):
-    print('-' * 40)
-
-    print(f'Título: {livros[i].titulo}')
-    print(f'Autor: {livros[i].autor}')
-    print(f'ano: {livros[i].ano}')
-    print(f'Código: {livros[i].codigo}')
-    print(f'Status: {livros[i].status}')
-
-    print('-' * 40)
 
 # Altera os dados de um livro existente
 def alterar_livro(livros):
@@ -94,12 +114,11 @@ def alterar_livro(livros):
         livros[i].titulo = input('Digite o TÍTULO do livro: ')
         livros[i].autor = input('Digite o AUTOR do livro: ')
         livros[i].ano = int(input('Digite o ANO de publicação do livro: '))
-        livros[i].codigo = input('Digite o CÓDIGO do livro: ')
         
-        print('\n✅ Livro alterado com sucesso!')
-        input('\nPressione ENTER para continuar...')
+        operação_sucesso()
     else:
-        naoencontrado()
+        naoencontrado(codigo)
+
 
 # Remove um livro da lista pelo código
 def remover_livro(livros):
@@ -111,19 +130,16 @@ def remover_livro(livros):
     codigo = input('Código do livro: ')
     i=pega_codigo(livros,codigo)
     if i !=-1:
-        livros.pop(i)
-
-        print('\n✅ Livro removido com sucesso!')
-        input('\nPressione ENTER para continuar...')
+        certeza = input('Tem certeza? (s/n)')
+        if certeza == 's':
+            livros.pop(i)
+            operação_sucesso()
+        else:
+            print('\nRemoção cancelada')
+            input('\nPressione ENTER para continuar...')
     else:
-        naoencontrado()
+        naoencontrado(codigo)
 
-# Bubble sort que ordena alfabeticamente, .lower para garantir que maiúsculas e minúsculas não interfiram na ordenação
-def ordenar_livros(livros):
-    for i in range(len(livros)):
-        for j in range(0, len(livros)-i-1):
-            if livros[j].titulo.lower() > livros[j+1].titulo.lower():
-                livros[j], livros[j+1] = livros[j+1], livros[j]
 
 # Lista todos os livros ordenados alfabeticamente
 def listar_livros(livros):
@@ -133,11 +149,13 @@ def listar_livros(livros):
     print('=' * 40)
 
     ordenar_livros(livros)
-    for i in range(len(livros)):  
+    print(f'Livros: {len(livros)}')
+    for i in range(len(livros)):
         print(f'{livros[i].titulo}, {livros[i].ano}')
    
     print('=' * 40)
     input('\nPressione ENTER para continuar...')
+
 
 # Empresta um livro, verificando se já está emprestado e marcando como Indisponível
 def emprestar_livro(livros, livros_emprestados):
@@ -146,21 +164,20 @@ def emprestar_livro(livros, livros_emprestados):
     print('         EMPRESTAR LIVRO')
     print('=' * 40)
 
-    cod = input('Código do livro: ')
-    i2=pega_codigo(livros_emprestados,cod)
+    codigo = input('CÓDIGO: ')
+    i2=pega_codigo(livros_emprestados,codigo)
     if i2!=-1:
         print('\n❌ Livro já emprestado')
         input('\nPressione ENTER para continuar...')
         return
     
-    i=pega_codigo(livros,cod)
+    i=pega_codigo(livros,codigo)
     if i!=-1:
         livros_emprestados.append(livros[i])
         livros[i].status = 'Indisponível'
-        print('\n✅ Livro emprestado com sucesso!')
-        input('\nPressione ENTER para continuar...')
+        operação_sucesso()
     else:
-        naoencontrado()
+        naoencontrado(codigo)
 
 # Devolve um livro, removendo da lista de emprestados e marcando como Disponível
 def devolver_livro(livros_emprestados):
@@ -168,16 +185,16 @@ def devolver_livro(livros_emprestados):
     print('=' * 40)
     print('         DEVOLVER LIVRO')
     print('=' * 40)
-    cod = input('Código do livro: ')
-    i=pega_codigo(livros_emprestados,cod)
+    codigo = input('CÓDIGO: ')
+    i=pega_codigo(livros_emprestados,codigo)
     if i!=-1:
         livros_emprestados[i].status = 'Disponível'  
         livros_emprestados.pop(i)
         
-        print('\n✅ Livro devolvido com sucesso!')
-        input('\nPressione ENTER para continuar...')
+        operação_sucesso()
     else:
-        naoencontrado()
+        naoencontrado(codigo)
+
 
 # Função principal que exibe o menu e chama as funções correspondentes
 def menu():
@@ -196,7 +213,7 @@ def menu():
         print('  5 - Listar livros')
         print('  6 - Emprestar livro')
         print('  7 - Devolver livro')
-        print('  0 - Sair')
+        print('  8 - Sair')
         print('=' * 40)
         op = int(input('  Opção: '))
         if op == 1:
@@ -213,7 +230,7 @@ def menu():
              emprestar_livro(livros, livros_emprestados)
         if op == 7:
              devolver_livro(livros_emprestados)
-        if op == 0:
+        if op == 8:
             limpar()
             print('=' * 40)
             print('        Até logo!')
