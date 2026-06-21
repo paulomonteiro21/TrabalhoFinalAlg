@@ -219,5 +219,3 @@ def menu():
             print('        Até logo!')
             print('=' * 40)
             break
-
-menu()
